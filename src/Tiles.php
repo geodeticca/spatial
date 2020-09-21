@@ -14,9 +14,10 @@ class Tiles extends Command
     protected function setDefaultParams()
     {
         $this->params = [
-            '-w openlayers',
+            '-w none',
             '-z 10-20',
             '-p mercator',
+            '--processes 2'
         ];
     }
 }

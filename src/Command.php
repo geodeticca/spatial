@@ -37,7 +37,7 @@ abstract class Command
      * @param string $source
      * @param string $destination
      * @param string $destType
-     * @throws \Exception
+     * @return void
      */
     public function __construct($source, $destination = null, $destType = null)
     {
@@ -52,7 +52,8 @@ abstract class Command
 
     /**
      * @param string $destination
-     * @param string $type
+     * @param string $destType
+     * @return $this
      */
     protected function setDestination($destination, $destType = self::DEST_TYPE_FILE)
     {
@@ -74,6 +75,8 @@ abstract class Command
         }
 
         $this->destination = $destination;
+
+        return $this;
     }
 
     abstract protected function setDefaultParams();
@@ -114,7 +117,7 @@ abstract class Command
 
         if ($debug === true) {
             echo $command;
-            exit;
+            exit();
         }
 
         $return = null;
