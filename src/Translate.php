@@ -1,6 +1,6 @@
 <?php
 /**
- * User:  * Created by PhpStorm.
+ * User: Maros Jasan
  * Date: 29.9.2017
  * Time: 16:25
  */
@@ -9,14 +9,27 @@ namespace Geodeticca\Spatial;
 
 class Translate extends Command
 {
+    /**
+     * @var string
+     */
     protected $command = 'gdal_translate';
 
+    /**
+     * @return $this
+     */
     protected function setDefaultParams()
     {
         $this->params = [];
+
+        return $this;
     }
 
-    public function addGCPs(array $set1, array $set2)
+    /**
+     * @param array $set1
+     * @param array $set2
+     * @return $this
+     */
+    public function addGCPs(array $set1, array $set2) : self
     {
         $set1Count = count($set1);
         $set2Count = count($set2);
@@ -36,5 +49,7 @@ class Translate extends Command
 
             $this->addParam('-gcp ' . $gcp);
         }
+
+        return $this;
     }
 }

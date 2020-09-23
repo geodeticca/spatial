@@ -35,11 +35,11 @@ abstract class Command
     /**
      * Command constructor.
      * @param string $source
-     * @param string $destination
-     * @param string $destType
+     * @param string|null $destination
+     * @param string|null $destType
      * @return void
      */
-    public function __construct($source, $destination = null, $destType = null)
+    public function __construct(string $source, string $destination = null, string $destType = null)
     {
         $this->source = $source;
 
@@ -52,10 +52,10 @@ abstract class Command
 
     /**
      * @param string $destination
-     * @param string $destType
+     * @param string|null $destType
      * @return $this
      */
-    protected function setDestination($destination, $destType = self::DEST_TYPE_FILE)
+    protected function setDestination(string $destination, string $destType = null) : self
     {
         switch (strtolower($destType)) {
             default:
@@ -79,13 +79,16 @@ abstract class Command
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     abstract protected function setDefaultParams();
 
     /**
      * @param string $value
      * @return $this
      */
-    public function addParam($value)
+    public function addParam(string $value) : self
     {
         $this->params[] = $value;
 
@@ -95,7 +98,7 @@ abstract class Command
     /**
      * @return string
      */
-    public function build()
+    protected function buildParams() : string
     {
         $paramsOptions = $this->params;
 
@@ -108,22 +111,35 @@ abstract class Command
     }
 
     /**
-     * @param bool $debug
+     * @return string
+     */
+    protected function buildCommand() : string
+    {
+        return $this->command . ' ' . $this->buildParams();
+    }
+
+    /**
      * @return bool
      */
-    public function execute($debug = false)
+    public function execute() : bool
     {
-        $command = $this->command . ' ' . $this->build();
-
-        if ($debug === true) {
-            echo $command;
-            exit();
-        }
+        $command = $this->buildCommand();
 
         $return = null;
         $output = [];
         exec($command, $output, $return);
 
         return ($return === 0);
+    }
+
+    /**
+     * @return void
+     */
+    public function debug() : void
+    {
+        $command = $this->buildCommand();
+
+        echo $command;
+        exit();
     }
 }

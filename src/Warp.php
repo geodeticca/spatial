@@ -9,8 +9,14 @@ namespace Geodeticca\Spatial;
 
 class Warp extends Command
 {
+    /**
+     * @var string
+     */
     protected $command = 'gdalwarp';
 
+    /**
+     * @return $this
+     */
     protected function setDefaultParams()
     {
         $this->params = [
@@ -20,5 +26,7 @@ class Warp extends Command
             '-co NUM_THREADS=4', // pocet vlakien vstupujucich do kompresneho algoritmu
             '-overwrite' // overwite file if exists
         ];
+
+        return $this;
     }
 }

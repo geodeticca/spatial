@@ -9,8 +9,14 @@ namespace Geodeticca\Spatial;
 
 class Tiles extends Command
 {
+    /**
+     * @var string
+     */
     protected $command = 'gdal2tiles.py';
 
+    /**
+     * @return $this
+     */
     protected function setDefaultParams()
     {
         $this->params = [
@@ -19,5 +25,7 @@ class Tiles extends Command
             '-p mercator',
             '--processes 2'
         ];
+
+        return $this;
     }
 }

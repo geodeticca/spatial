@@ -27,17 +27,11 @@ class Info extends Command
     }
 
     /**
-     * @param bool $debug
      * @return \stdClass
      */
-    public function execute($debug = false)
+    public function execute()
     {
-        $command = $this->command . ' ' . $this->build();
-
-        if ($debug === true) {
-            echo $command;
-            exit;
-        }
+        $command = $this->buildCommand();
 
         $return = null;
         $output = [];
