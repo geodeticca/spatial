@@ -17,7 +17,7 @@ class Translate extends Command
     /**
      * @return $this
      */
-    protected function setDefaultParams()
+    protected function setDefaultParams(): self
     {
         $this->params = [];
 
@@ -29,7 +29,7 @@ class Translate extends Command
      * @param array $set2
      * @return $this
      */
-    public function addGCPs(array $set1, array $set2) : self
+    public function addGCPs(array $set1, array $set2): self
     {
         $set1Count = count($set1);
         $set2Count = count($set2);
@@ -41,7 +41,7 @@ class Translate extends Command
             $set2 = array_slice($set2, 0, $pointsCount);
         }
 
-        for($i = 0; $i < $pointsCount; $i++) {
+        for ($i = 0; $i < $pointsCount; $i++) {
             $set1Point = $set1[$i];
             $set2Point = $set2[$i];
 

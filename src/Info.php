@@ -17,7 +17,7 @@ class Info extends Command
     /**
      * @return $this
      */
-    protected function setDefaultParams()
+    protected function setDefaultParams(): self
     {
         $this->params = [
             '-json', // display the output in json format

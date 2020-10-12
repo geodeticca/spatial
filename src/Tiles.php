@@ -15,9 +15,17 @@ class Tiles extends Command
     protected $command = 'gdal2tiles.py';
 
     /**
+     * @return string
+     */
+    protected function getDestType(): string
+    {
+        return self::DEST_TYPE_DIR;
+    }
+
+    /**
      * @return $this
      */
-    protected function setDefaultParams()
+    protected function setDefaultParams(): self
     {
         $this->params = [
             '-w none',
@@ -27,5 +35,15 @@ class Tiles extends Command
         ];
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildExecutable(): string
+    {
+        $executable = trim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
+
+        return 'python ' . $executable;
     }
 }

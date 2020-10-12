@@ -36,27 +36,46 @@ abstract class Command
      * Command constructor.
      * @param string $source
      * @param string|null $destination
-     * @param string|null $destType
-     * @return void
      */
-    public function __construct(string $source, string $destination = null, string $destType = null)
+    public function __construct(string $source, string $destination = null)
     {
         $this->source = $source;
 
         if ($destination) {
-            $this->setDestination($destination, $destType);
+            $this->setDestination($destination);
         }
 
         $this->setDefaultParams();
     }
 
     /**
+     * @return string
+     */
+    protected function getDestType(): string
+    {
+        return self::DEST_TYPE_FILE;
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getExecutable()
+    {
+        $config = Config::instance();
+
+        if (isset($config['executable'])) {
+            return $config['executable'];
+        }
+    }
+
+    /**
      * @param string $destination
-     * @param string|null $destType
      * @return $this
      */
-    protected function setDestination(string $destination, string $destType = null) : self
+    protected function setDestination(string $destination): self
     {
+        $destType = $this->getDestType();
+
         switch (strtolower($destType)) {
             default:
             case self::DEST_TYPE_FILE:
@@ -88,7 +107,7 @@ abstract class Command
      * @param string $value
      * @return $this
      */
-    public function addParam(string $value) : self
+    public function addParam(string $value): self
     {
         $this->params[] = $value;
 
@@ -98,7 +117,7 @@ abstract class Command
     /**
      * @return string
      */
-    protected function buildParams() : string
+    protected function buildParams(): string
     {
         $paramsOptions = $this->params;
 
@@ -113,15 +132,23 @@ abstract class Command
     /**
      * @return string
      */
-    protected function buildCommand() : string
+    protected function buildExecutable(): string
     {
-        return $this->command . ' ' . $this->buildParams();
+        return trim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildCommand(): string
+    {
+        return $this->buildExecutable() . ' ' . $this->buildParams();
     }
 
     /**
      * @return bool
      */
-    public function execute() : bool
+    public function execute(): bool
     {
         $command = $this->buildCommand();
 
@@ -135,7 +162,7 @@ abstract class Command
     /**
      * @return void
      */
-    public function debug() : void
+    public function debug(): void
     {
         $command = $this->buildCommand();
 
