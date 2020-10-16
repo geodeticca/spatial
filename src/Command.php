@@ -76,7 +76,7 @@ abstract class Command
     {
         $destType = $this->getDestType();
 
-        switch (strtolower($destType)) {
+        switch ($destType) {
             default:
             case self::DEST_TYPE_FILE:
                 $destDir = dirname($destination);
@@ -93,7 +93,7 @@ abstract class Command
             mkdir($destDir, 0777, true);
         }
 
-        $this->destination = $destination;
+        $this->destination = $destDir;
 
         return $this;
     }
