@@ -47,10 +47,21 @@ class Config
      */
     public static function instance(): self
     {
-        if (is_null(self::$instances)) {
-            self::$instances = new self;
+        if (is_null(self::$instance)) {
+            self::$instance = new self;
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public static function get(string $key)
+    {
+        if (isset(self::$config[$key])) {
+            return self::$config[$key];
+        }
     }
 }

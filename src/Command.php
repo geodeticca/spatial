@@ -39,7 +39,7 @@ abstract class Command
      */
     public function __construct(string $source, string $destination = null)
     {
-        $this->source = $source;
+        $this->setSource($source);
 
         if ($destination) {
             $this->setDestination($destination);
@@ -63,9 +63,18 @@ abstract class Command
     {
         $config = Config::instance();
 
-        if (isset($config['executable'])) {
-            return $config['executable'];
-        }
+        return $config::get('executable');
+    }
+
+    /**
+     * @param string $source
+     * @return $this
+     */
+    public function setSource(string $source): self
+    {
+        $this->source = $source;
+
+        return $this;
     }
 
     /**
@@ -121,9 +130,9 @@ abstract class Command
     {
         $paramsOptions = $this->params;
 
-        $paramsOptions[] = $this->source;
+        $paramsOptions[] = '"' . $this->source . '"';
         if ($this->destination) {
-            $paramsOptions[] = $this->destination;
+            $paramsOptions[] = '"' . $this->destination . '"';
         }
 
         return trim(implode(' ', $paramsOptions));

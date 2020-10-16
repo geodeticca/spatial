@@ -42,7 +42,7 @@ class Tiles extends Command
      */
     protected function buildExecutable(): string
     {
-        $executable = trim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
+        $executable = parent::buildExecutable();
 
         return 'python ' . $executable;
     }
