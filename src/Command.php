@@ -143,7 +143,7 @@ abstract class Command
      */
     protected function buildExecutable(): string
     {
-        return trim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
+        return rtrim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
     }
 
     /**
