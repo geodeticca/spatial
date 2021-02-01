@@ -29,9 +29,8 @@ class Tiles extends Command
     {
         $this->params = [
             '-w none',
-            '-z 10-20',
             '-p mercator',
-            '--processes 2'
+            //'--processes 2',
         ];
 
         return $this;
