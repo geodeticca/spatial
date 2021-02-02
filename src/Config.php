@@ -60,8 +60,22 @@ class Config
      */
     public static function get(string $key)
     {
-        if (isset(self::$config[$key])) {
-            return self::$config[$key];
+        $config = self::$config;
+
+        if (strpos($key, '.') !== false) {
+            $indexes = explode('.', $key);
+
+            foreach ($indexes as $index) {
+                if (array_key_exists($index, $config)) {
+                    $config = $config[$index];
+                }
+            }
+
+            return $config;
+        } else {
+            if (array_key_exists($key, $config)) {
+                return $config[$key];
+            }
         }
     }
 }

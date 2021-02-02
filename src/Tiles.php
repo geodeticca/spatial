@@ -43,6 +43,6 @@ class Tiles extends Command
     {
         $executable = parent::buildExecutable();
 
-        return 'python ' . $executable;
+        return 'python3 ' . $executable;
     }
 }
