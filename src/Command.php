@@ -63,7 +63,7 @@ abstract class Command
     {
         $config = Config::instance();
 
-        return $config::get('executable');
+        return $config::get('gdal.executable');
     }
 
     /**
