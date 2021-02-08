@@ -1,23 +1,23 @@
 <?php
 /**
  * User: Maros Jasan
- * Date: 16.10.2017
- * Time: 14:54
+ * Date: 4. 2. 2021
+ * Time: 15:29
  */
 
 namespace Geodeticca\Spatial;
 
-class Info extends Command
+class TileIndex extends Command
 {
     /**
      * @var string
      */
-    protected $command = 'gdalinfo';
+    protected $command = 'gdaltindex';
 
     /**
-     * @var array
+     * @var string
      */
-    protected $result = [];
+    protected $srcDestOrder = 'REVERSE';
 
     /**
      * @return $this
@@ -25,18 +25,10 @@ class Info extends Command
     protected function setDefaultParams(): self
     {
         $this->params = [
-            '-json', // display the output in json format
+            '-lyr_name index', // default layer name is index
         ];
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getResult(): array
-    {
-        return $this->result;
     }
 
     /**
@@ -49,13 +41,6 @@ class Info extends Command
         $return = null;
         $output = [];
         exec($command, $output, $return);
-
-        if (!empty($output)) {
-            $result = implode(null, $output);
-            $result = str_replace(['\n'], [null], $result);
-
-            $this->result = json_decode($result);
-        }
 
         return ($return === 0);
     }

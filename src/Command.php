@@ -25,9 +25,19 @@ abstract class Command
     protected $destination;
 
     /**
+     * @var string
+     */
+    protected $srcDestOrder = 'STANDARD';
+
+    /**
      * @var array
      */
     protected $params = [];
+
+    /**
+     * @var array
+     */
+    protected $suffixes = [];
 
     const DEST_TYPE_FILE = 'file';
     const DEST_TYPE_DIR = 'dir';
@@ -39,10 +49,15 @@ abstract class Command
      */
     public function __construct(string $source, string $destination = null)
     {
-        $this->setSource($source);
+        if ($this->srcDestOrder === 'STANDARD') {
+            $this->setSource($source);
 
-        if ($destination) {
-            $this->setDestination($destination);
+            if ($destination) {
+                $this->setDestination($destination);
+            }
+        } else {
+            $this->setSource($destination);
+            $this->setDestination($source);
         }
 
         $this->setDefaultParams();
@@ -128,14 +143,44 @@ abstract class Command
      */
     protected function buildParams(): string
     {
-        $paramsOptions = $this->params;
+        return trim(implode(' ', $this->params));
+    }
 
-        $paramsOptions[] = '"' . $this->source . '"';
-        if ($this->destination) {
-            $paramsOptions[] = '"' . $this->destination . '"';
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function addSuffix(string $value): self
+    {
+        $this->suffixes[] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildSuffixes(): string
+    {
+        return trim(implode(' ', $this->suffixes));
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildSrcDest(): string
+    {
+        $srcDestOptions = [
+            '"' . $this->source . '"',
+        ];
+
+        if (!is_null($this->destination)) {
+            $srcDestOptions = array_merge($srcDestOptions, [
+                '"' . $this->destination . '"',
+            ]);
         }
 
-        return trim(implode(' ', $paramsOptions));
+        return trim(implode(' ', $srcDestOptions));
     }
 
     /**
@@ -151,7 +196,12 @@ abstract class Command
      */
     protected function buildCommand(): string
     {
-        return $this->buildExecutable() . ' ' . $this->buildParams();
+        return implode(' ', [
+            $this->buildExecutable(),
+            $this->buildParams(),
+            $this->buildSrcDest(),
+            $this->buildSuffixes(),
+        ]);
     }
 
     /**
