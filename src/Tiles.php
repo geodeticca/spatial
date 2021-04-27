@@ -15,17 +15,34 @@ class Tiles extends Command
     protected $command = 'gdal2tiles.py';
 
     /**
+     * @return string
+     */
+    protected function getDestType(): string
+    {
+        return self::DEST_TYPE_DIR;
+    }
+
+    /**
      * @return $this
      */
-    protected function setDefaultParams()
+    protected function setDefaultParams(): self
     {
         $this->params = [
             '-w none',
-            '-z 10-20',
             '-p mercator',
-            '--processes 2'
+            //'--processes 2',
         ];
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildExecutable(): string
+    {
+        $executable = parent::buildExecutable();
+
+        return 'python3 ' . $executable;
     }
 }

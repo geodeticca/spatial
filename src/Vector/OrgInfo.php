@@ -5,14 +5,16 @@
  * Time: 14:54
  */
 
-namespace Geodeticca\Spatial;
+namespace Geodeticca\Spatial\Vector;
 
-class Info extends Command
+use Geodeticca\Spatial\Command;
+
+class OrgInfo extends Command
 {
     /**
      * @var string
      */
-    protected $command = 'gdalinfo';
+    protected $command = 'ogrinfo';
 
     /**
      * @var array
@@ -25,7 +27,7 @@ class Info extends Command
     protected function setDefaultParams(): self
     {
         $this->params = [
-            '-json', // display the output in json format
+            '-so',
         ];
 
         return $this;
@@ -53,8 +55,8 @@ class Info extends Command
         if (!empty($output)) {
             $result = implode(null, $output);
             $result = str_replace(['\n'], [null], $result);
-
-            $this->result = json_decode($result);
+dd($result);
+            $this->result = $result;
         }
 
         return ($return === 0);

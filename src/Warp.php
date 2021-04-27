@@ -17,7 +17,7 @@ class Warp extends Command
     /**
      * @return $this
      */
-    protected function setDefaultParams()
+    protected function setDefaultParams(): self
     {
         $this->params = [
             '-wm 4096', // sprava pamate

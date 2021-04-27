@@ -25,9 +25,19 @@ abstract class Command
     protected $destination;
 
     /**
+     * @var string
+     */
+    protected $srcDestOrder = 'STANDARD';
+
+    /**
      * @var array
      */
     protected $params = [];
+
+    /**
+     * @var array
+     */
+    protected $suffixes = [];
 
     const DEST_TYPE_FILE = 'file';
     const DEST_TYPE_DIR = 'dir';
@@ -36,28 +46,61 @@ abstract class Command
      * Command constructor.
      * @param string $source
      * @param string|null $destination
-     * @param string|null $destType
-     * @return void
      */
-    public function __construct(string $source, string $destination = null, string $destType = null)
+    public function __construct(string $source, string $destination = null)
     {
-        $this->source = $source;
+        if ($this->srcDestOrder === 'STANDARD') {
+            $this->setSource($source);
 
-        if ($destination) {
-            $this->setDestination($destination, $destType);
+            if ($destination) {
+                $this->setDestination($destination);
+            }
+        } else {
+            $this->setSource($destination);
+            $this->setDestination($source);
         }
 
         $this->setDefaultParams();
     }
 
     /**
-     * @param string $destination
-     * @param string|null $destType
+     * @return string
+     */
+    protected function getDestType(): string
+    {
+        return self::DEST_TYPE_FILE;
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getExecutable()
+    {
+        $config = Config::instance();
+
+        return $config::get('gdal.executable');
+    }
+
+    /**
+     * @param string $source
      * @return $this
      */
-    protected function setDestination(string $destination, string $destType = null) : self
+    public function setSource(string $source): self
     {
-        switch (strtolower($destType)) {
+        $this->source = $source;
+
+        return $this;
+    }
+
+    /**
+     * @param string $destination
+     * @return $this
+     */
+    protected function setDestination(string $destination): self
+    {
+        $destType = $this->getDestType();
+
+        switch ($destType) {
             default:
             case self::DEST_TYPE_FILE:
                 $destDir = dirname($destination);
@@ -74,7 +117,7 @@ abstract class Command
             mkdir($destDir, 0777, true);
         }
 
-        $this->destination = $destination;
+        $this->destination = $destDir;
 
         return $this;
     }
@@ -88,7 +131,7 @@ abstract class Command
      * @param string $value
      * @return $this
      */
-    public function addParam(string $value) : self
+    public function addParam(string $value): self
     {
         $this->params[] = $value;
 
@@ -98,30 +141,73 @@ abstract class Command
     /**
      * @return string
      */
-    protected function buildParams() : string
+    protected function buildParams(): string
     {
-        $paramsOptions = $this->params;
+        return trim(implode(' ', $this->params));
+    }
 
-        $paramsOptions[] = $this->source;
-        if ($this->destination) {
-            $paramsOptions[] = $this->destination;
-        }
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function addSuffix(string $value): self
+    {
+        $this->suffixes[] = $value;
 
-        return trim(implode(' ', $paramsOptions));
+        return $this;
     }
 
     /**
      * @return string
      */
-    protected function buildCommand() : string
+    protected function buildSuffixes(): string
     {
-        return $this->command . ' ' . $this->buildParams();
+        return trim(implode(' ', $this->suffixes));
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildSrcDest(): string
+    {
+        $srcDestOptions = [
+            '"' . $this->source . '"',
+        ];
+
+        if (!is_null($this->destination)) {
+            $srcDestOptions = array_merge($srcDestOptions, [
+                '"' . $this->destination . '"',
+            ]);
+        }
+
+        return trim(implode(' ', $srcDestOptions));
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildExecutable(): string
+    {
+        return rtrim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildCommand(): string
+    {
+        return implode(' ', [
+            $this->buildExecutable(),
+            $this->buildParams(),
+            $this->buildSrcDest(),
+            $this->buildSuffixes(),
+        ]);
     }
 
     /**
      * @return bool
      */
-    public function execute() : bool
+    public function execute(): bool
     {
         $command = $this->buildCommand();
 
@@ -135,7 +221,7 @@ abstract class Command
     /**
      * @return void
      */
-    public function debug() : void
+    public function debug(): void
     {
         $command = $this->buildCommand();
 
