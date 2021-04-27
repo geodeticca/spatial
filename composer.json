@@ -1,6 +1,6 @@
 {
     "name": "geodeticca/spatial",
-    "description": "Simple package for working with GDAL.",
+    "description": "Simple package for working with GDAL library.",
     "keywords": ["gdal"],
     "license": "MIT",
     "require": {
