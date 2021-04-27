@@ -117,7 +117,7 @@ abstract class Command
             mkdir($destDir, 0777, true);
         }
 
-        $this->destination = $destDir;
+        $this->destination = $destination;
 
         return $this;
     }
