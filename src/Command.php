@@ -82,7 +82,7 @@ abstract class Command
      * @param string $destination
      * @return $this
      */
-    protected function setDestination(string $destination): self
+    public function setDestination(string $destination): self
     {
         $filename = basename($destination);
 
