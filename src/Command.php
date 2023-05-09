@@ -39,9 +39,6 @@ abstract class Command
      */
     protected $suffixes = [];
 
-    const DEST_TYPE_FILE = 'file';
-    const DEST_TYPE_DIR = 'dir';
-
     /**
      * Command constructor.
      * @param string $source
@@ -55,20 +52,9 @@ abstract class Command
             if ($destination) {
                 $this->setDestination($destination);
             }
-        } else {
-            $this->setSource($destination);
-            $this->setDestination($source);
         }
 
         $this->setDefaultParams();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getDestType(): string
-    {
-        return self::DEST_TYPE_FILE;
     }
 
     /**
@@ -98,19 +84,12 @@ abstract class Command
      */
     protected function setDestination(string $destination): self
     {
-        $destType = $this->getDestType();
+        $filename = basename($destination);
 
-        switch ($destType) {
-            default:
-            case self::DEST_TYPE_FILE:
-                $destDir = dirname($destination);
-
-                break;
-
-            case self::DEST_TYPE_DIR:
-                $destDir = $destination;
-
-                break;
+        if (is_filename($filename)) {
+            $destDir = dirname($destination);
+        } else {
+            $destDir = $destination;
         }
 
         if (!file_exists($destDir)) {
@@ -167,16 +146,31 @@ abstract class Command
 
     /**
      * @return string
+     * @throws \Exception
      */
     protected function buildSrcDest(): string
     {
-        $srcDestOptions = [
-            '"' . $this->source . '"',
-        ];
+        if ($this->srcDestOrder === 'STANDARD'){
+            $srcDestOptions = [
+                '"' . $this->source . '"',
+            ];
 
-        if (!is_null($this->destination)) {
-            $srcDestOptions = array_merge($srcDestOptions, [
+            if (!is_null($this->destination)) {
+                $srcDestOptions = array_merge($srcDestOptions, [
+                    '"' . $this->destination . '"',
+                ]);
+            }
+        } else {
+            if (is_null($this->destination)) {
+                throw new \Exception('Destination parameter cannot be null.');
+            }
+
+            $srcDestOptions = [
                 '"' . $this->destination . '"',
+            ];
+
+            $srcDestOptions = array_merge($srcDestOptions, [
+                '"' . $this->source . '"',
             ]);
         }
 
@@ -188,11 +182,13 @@ abstract class Command
      */
     protected function buildExecutable(): string
     {
-        return rtrim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
+        //return rtrim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
+        return $this->command;
     }
 
     /**
      * @return string
+     * @throws \Exception
      */
     protected function buildCommand(): string
     {
@@ -206,6 +202,7 @@ abstract class Command
 
     /**
      * @return bool
+     * @throws \Exception
      */
     public function execute(): bool
     {
@@ -219,7 +216,7 @@ abstract class Command
     }
 
     /**
-     * @return void
+     * @throws \Exception
      */
     public function debug(): void
     {

@@ -15,14 +15,6 @@ class Tiles extends Command
     protected $command = 'gdal2tiles.py';
 
     /**
-     * @return string
-     */
-    protected function getDestType(): string
-    {
-        return self::DEST_TYPE_DIR;
-    }
-
-    /**
      * @return $this
      */
     protected function setDefaultParams(): self

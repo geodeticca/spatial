@@ -9,7 +9,10 @@
     "autoload": {
         "psr-4": {
             "Geodeticca\\Spatial\\": "src/"
-        }
+        },
+        "files": [
+            "helpers/helpers.php"
+        ]
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
