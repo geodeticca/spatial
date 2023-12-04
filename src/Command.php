@@ -105,12 +105,21 @@ abstract class Command
     abstract protected function setDefaultParams();
 
     /**
-     * @param string $value
+     * @param string $param
      * @return $this
      */
-    public function addParam(string $value): self
+    public function addParam(string $param): self
     {
-        $this->params[] = $value;
+        $param = trim($param);
+        
+        if (strpos($param, ' ') !== false) {
+            list($key, $value) = explode(' ', $param, 2);
+        } else {
+            $key = $param;
+            $value = '';
+        }
+
+        $this->params[$key] = $value;
 
         return $this;
     }
@@ -120,7 +129,9 @@ abstract class Command
      */
     protected function buildParams(): string
     {
-        return trim(implode(' ', $this->params));
+        return trim(implode(' ', array_map(function ($value, $key) {
+            return trim($key . ' ' . $value);
+        }, $this->params)));
     }
 
     /**
