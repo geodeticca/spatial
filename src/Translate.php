@@ -19,7 +19,10 @@ class Translate extends Command
      */
     protected function setDefaultParams(): self
     {
-        $this->params = [];
+        $this->params = [
+            //'--config GDAL_CACHEMAX 2048',
+            '-co NUM_THREADS=4', // pocet vlakien vstupujucich do kompresneho algoritmu
+        ];
 
         return $this;
     }

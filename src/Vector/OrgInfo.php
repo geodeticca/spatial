@@ -43,6 +43,7 @@ class OrgInfo extends Command
 
     /**
      * @return bool
+     * @throws \Exception
      */
     public function execute(): bool
     {
@@ -55,7 +56,7 @@ class OrgInfo extends Command
         if (!empty($output)) {
             $result = implode(null, $output);
             $result = str_replace(['\n'], [null], $result);
-dd($result);
+
             $this->result = $result;
         }
 

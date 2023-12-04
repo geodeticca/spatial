@@ -46,12 +46,10 @@ abstract class Command
      */
     public function __construct(string $source, string $destination = null)
     {
-        if ($this->srcDestOrder === 'STANDARD') {
-            $this->setSource($source);
+        $this->setSource($source);
 
-            if ($destination) {
-                $this->setDestination($destination);
-            }
+        if ($destination) {
+            $this->setDestination($destination);
         }
 
         $this->setDefaultParams();
@@ -150,14 +148,17 @@ abstract class Command
      */
     protected function buildSrcDest(): string
     {
+        $src = '"' . dirname($this->source) . '"' . DIRECTORY_SEPARATOR . basename($this->source);
+        $dest = '"' . dirname($this->destination) . '"' . DIRECTORY_SEPARATOR . basename($this->destination);
+
         if ($this->srcDestOrder === 'STANDARD'){
             $srcDestOptions = [
-                '"' . $this->source . '"',
+                $src,
             ];
 
             if (!is_null($this->destination)) {
                 $srcDestOptions = array_merge($srcDestOptions, [
-                    '"' . $this->destination . '"',
+                    $dest,
                 ]);
             }
         } else {
@@ -166,11 +167,11 @@ abstract class Command
             }
 
             $srcDestOptions = [
-                '"' . $this->destination . '"',
+                $dest,
             ];
 
             $srcDestOptions = array_merge($srcDestOptions, [
-                '"' . $this->source . '"',
+                $src,
             ]);
         }
 

@@ -33,6 +33,7 @@ class TileIndex extends Command
 
     /**
      * @return bool
+     * @throws \Exception
      */
     public function execute(): bool
     {
