@@ -24,9 +24,8 @@ class Info extends Command
      */
     protected function setDefaultParams(): self
     {
-        $this->params = [
-            '-json', // display the output in json format
-        ];
+        $this
+            ->addParam('-json'); // display the output in json format
 
         return $this;
     }

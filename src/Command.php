@@ -7,6 +7,8 @@
 
 namespace Geodeticca\Spatial;
 
+use Geodeticca\Spatial\Config as SpatialConfig;
+
 abstract class Command
 {
     /**
@@ -37,7 +39,17 @@ abstract class Command
     /**
      * @var array
      */
+    protected $multiParams = [];
+
+    /**
+     * @var array
+     */
     protected $suffixes = [];
+
+    /**
+     * @var \Geodeticca\Spatial\Config
+     */
+    protected $config;
 
     /**
      * Command constructor.
@@ -46,6 +58,8 @@ abstract class Command
      */
     public function __construct(string $source, string $destination = null)
     {
+        $this->configure();
+
         $this->setSource($source);
 
         if ($destination) {
@@ -55,14 +69,18 @@ abstract class Command
         $this->setDefaultParams();
     }
 
-    /**
-     * @return string|null
-     */
-    protected function getExecutable()
-    {
-        $config = Config::instance();
 
-        return $config::get('gdal.executable');
+    /**
+     * @return $this
+     */
+    protected function configure()
+    {
+        $this->config = SpatialConfig::instance();
+        $this->config->configure([
+            'multiparams' => ['--config', '-wo', '-co'],
+        ]);
+
+        return $this;
     }
 
     /**
@@ -106,6 +124,15 @@ abstract class Command
 
     /**
      * @param string $param
+     * @return bool
+     */
+    public function isMultiParam(string $param): bool
+    {
+        return in_array($param, $this->config->get('multiparams'));
+    }
+
+    /**
+     * @param string $param
      * @return $this
      */
     public function addParam(string $param): self
@@ -119,7 +146,11 @@ abstract class Command
             $value = '';
         }
 
-        $this->params[$key] = $value;
+        if ($this->isMultiParam($key)) {
+            $this->multiParams[] = $param;
+        } else {
+            $this->params[$key] = $value;
+        }
 
         return $this;
     }
@@ -129,9 +160,18 @@ abstract class Command
      */
     protected function buildParams(): string
     {
-        return trim(implode(' ', array_map(function ($value, $key) {
-            return trim($key . ' ' . $value);
-        }, $this->params)));
+        $params = $this->params;
+        $paramsKeys = array_keys($params);
+
+        $multiParams = trim(implode(' ', $this->multiParams));
+
+        $params = trim(implode(' ', array_map(function ($paramKey) use ($params) {
+            $paramValue = $params[$paramKey];
+
+            return trim($paramKey . ' ' . $paramValue);
+        }, $paramsKeys)));
+
+        return $multiParams . ' ' . $params;
     }
 
     /**
@@ -194,7 +234,6 @@ abstract class Command
      */
     protected function buildExecutable(): string
     {
-        //return rtrim($this->getExecutable() . DIRECTORY_SEPARATOR . $this->command, DIRECTORY_SEPARATOR);
         return $this->command;
     }
 

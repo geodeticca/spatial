@@ -24,9 +24,8 @@ class TileIndex extends Command
      */
     protected function setDefaultParams(): self
     {
-        $this->params = [
-            '-lyr_name index', // default layer name is index
-        ];
+        $this
+            ->addParam('-lyr_name index'); // default layer name is index
 
         return $this;
     }

@@ -19,11 +19,9 @@ class Tiles extends Command
      */
     protected function setDefaultParams(): self
     {
-        $this->params = [
-            '-w none',
-            '-p mercator',
-            //'--processes 2',
-        ];
+        $this
+            ->addParam('-w none')
+            ->addParam('-p mercator');
 
         return $this;
     }

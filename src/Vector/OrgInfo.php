@@ -26,9 +26,8 @@ class OrgInfo extends Command
      */
     protected function setDefaultParams(): self
     {
-        $this->params = [
-            '-so',
-        ];
+        $this
+            ->addParam('-so');
 
         return $this;
     }
