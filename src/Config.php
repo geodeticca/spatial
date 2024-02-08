@@ -12,7 +12,7 @@ class Config
     /**
      * @var array
      */
-    private static $config = [];
+    public static $config = [];
 
     /**
      * @var \Geodeticca\Spatial\Config
@@ -35,11 +35,14 @@ class Config
 
     /**
      * @param array $config
-     * @return void
+     * @return \Geodeticca\Spatial\Config
      */
-    public static function configure(array $config): void
+    public static function configure(array $config): self
     {
-        self::$config = $config;
+        $self = self::instance();
+        $self::$config = $config;
+
+        return $self;
     }
 
     /**
@@ -60,7 +63,9 @@ class Config
      */
     public static function get(string $key)
     {
-        $config = self::$config;
+        $self = self::instance();
+
+        $config = $self::$config;
 
         if (strpos($key, '.') !== false) {
             $indexes = explode('.', $key);

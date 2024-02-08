@@ -69,7 +69,6 @@ abstract class Command
         $this->setDefaultParams();
     }
 
-
     /**
      * @return $this
      */
