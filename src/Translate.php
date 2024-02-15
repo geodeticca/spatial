@@ -20,7 +20,7 @@ class Translate extends Command
     protected function setDefaultParams(): self
     {
         $this
-            ->addParam('-co NUM_THREADS=4'); // pocet vlakien vstupujucich do kompresneho algoritmu
+            ->addParam('-co NUM_THREADS=4');
 
         return $this;
     }
