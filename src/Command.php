@@ -196,13 +196,13 @@ abstract class Command
             $paramValue = $this->multiParams[$paramKey];
 
             $paramValueKeys = array_keys($paramValue);
-            $carry[] = $paramKey . ' ' . trim(implode(' ', array_reduce($paramValueKeys, function ($subCarry, $subKey) use ($paramValue) {
-                    $subValue = $paramValue[$subKey];
+            $carry[] = trim(implode(' ', array_reduce($paramValueKeys, function ($subCarry, $subKey) use ($paramKey, $paramValue) {
+                $subValue = $paramValue[$subKey];
 
-                    $subCarry[] = $subKey . '=' . $subValue;
+                $subCarry[] = $paramKey . ' ' . $subKey . '=' . $subValue;
 
-                    return $subCarry;
-                }, [])));
+                return $subCarry;
+            }, [])));
 
             return $carry;
         }, [])));
@@ -211,7 +211,7 @@ abstract class Command
         $params = trim(implode(' ', array_reduce($paramsKeys, function ($carry, $paramKey) {
             $paramValue = $this->params[$paramKey];
 
-            $carry[] = $paramKey . ' ' . $paramValue;
+            $carry[] = trim($paramKey . ' ' . $paramValue);
 
             return $carry;
         }, [])));
