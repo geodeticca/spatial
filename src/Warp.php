@@ -21,7 +21,7 @@ class Warp extends Command
     {
         $this
             ->addParam('--config GDAL_DISABLE_READDIR_ON_OPEN TRUE') // zakaz nacitania celeho adresara
-            ->addParam('--config GDAL_CACHEMAX 4096') // cache management
+            ->addParam('--config GDAL_CACHEMAX 1024') // cache management
             ->addParam('-wm 4096') //  virtualna pamat
             ->addParam('-multi') // multi processing
             ->addParam('-wo NUM_THREADS=4') // pocet vlakien vstupujucich do warp algoritmu

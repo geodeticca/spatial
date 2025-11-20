@@ -44,6 +44,11 @@ abstract class Command
     /**
      * @var array
      */
+    protected $configParams = [];
+
+    /**
+     * @var array
+     */
     protected $suffixes = [];
 
     /**
@@ -76,7 +81,8 @@ abstract class Command
     {
         $this->config = SpatialConfig::instance();
         $this->config->configure([
-            'multiparams' => ['--config', '-wo', '-co'],
+            'configparam' => '--config',
+            'multiparams' => ['-wo', '-co'],
         ]);
 
         return $this;
@@ -125,6 +131,15 @@ abstract class Command
      * @param string $param
      * @return bool
      */
+    public function isConfigParam(string $param): bool
+    {
+        return $param === $this->config->get('configparam');
+    }
+
+    /**
+     * @param string $param
+     * @return bool
+     */
     public function isMultiParam(string $param): bool
     {
         return in_array($param, $this->config->get('multiparams'));
@@ -137,7 +152,7 @@ abstract class Command
     public function addParam(string $param): self
     {
         $param = trim($param);
-        
+
         if (strpos($param, ' ') !== false) {
             list($key, $value) = explode(' ', $param, 2);
         } else {
@@ -145,8 +160,16 @@ abstract class Command
             $value = '';
         }
 
-        if ($this->isMultiParam($key)) {
-            $this->multiParams[] = $param;
+        if ($this->isConfigParam($key) || $this->isMultiParam($key)) {
+            if ($this->isConfigParam($key)) {
+                list($subKey, $subValue) = explode(' ', $value, 2);
+
+                $this->configParams[$subKey] = $subValue;
+            } elseif ($this->isMultiParam($key)) {
+                list($subKey, $subValue) = explode('=', $value, 2);
+
+                $this->multiParams[$key][$subKey] = $subValue;
+            }
         } else {
             $this->params[$key] = $value;
         }
@@ -159,18 +182,41 @@ abstract class Command
      */
     protected function buildParams(): string
     {
-        $params = $this->params;
-        $paramsKeys = array_keys($params);
+        $configParamsKeys = array_keys($this->configParams);
+        $configParams = trim(implode(' ', array_reduce($configParamsKeys, function ($carry, $paramKey) {
+            $paramValue = $this->configParams[$paramKey];
 
-        $multiParams = trim(implode(' ', $this->multiParams));
+            $carry[] = $this->config->get('configparam') . ' ' . $paramKey . ' ' .$paramValue;
 
-        $params = trim(implode(' ', array_map(function ($paramKey) use ($params) {
-            $paramValue = $params[$paramKey];
+            return $carry;
+        }, [])));
 
-            return trim($paramKey . ' ' . $paramValue);
-        }, $paramsKeys)));
+        $multiParamsKeys = array_keys($this->multiParams);
+        $multiParams = trim(implode(' ', array_reduce($multiParamsKeys, function ($carry, $paramKey) {
+            $paramValue = $this->multiParams[$paramKey];
 
-        return $multiParams . ' ' . $params;
+            $paramValueKeys = array_keys($paramValue);
+            $carry[] = $paramKey . ' ' . trim(implode(' ', array_reduce($paramValueKeys, function ($subCarry, $subKey) use ($paramValue) {
+                    $subValue = $paramValue[$subKey];
+
+                    $subCarry[] = $subKey . '=' . $subValue;
+
+                    return $subCarry;
+                }, [])));
+
+            return $carry;
+        }, [])));
+
+        $paramsKeys = array_keys($this->params);
+        $params = trim(implode(' ', array_reduce($paramsKeys, function ($carry, $paramKey) {
+            $paramValue = $this->params[$paramKey];
+
+            $carry[] = $paramKey . ' ' . $paramValue;
+
+            return $carry;
+        }, [])));
+
+        return $configParams . ' ' . $multiParams . ' ' . $params;
     }
 
     /**
@@ -198,8 +244,11 @@ abstract class Command
      */
     protected function buildSrcDest(): string
     {
-        $src = '"' . dirname($this->source) . '"' . DIRECTORY_SEPARATOR . basename($this->source);
-        $dest = '"' . dirname($this->destination) . '"' . DIRECTORY_SEPARATOR . basename($this->destination);
+        //$src = '"' . dirname($this->source) . '"' . DIRECTORY_SEPARATOR . basename($this->source);
+        //$dest = '"' . dirname($this->destination) . '"' . DIRECTORY_SEPARATOR . basename($this->destination);
+
+        $src = '"' . $this->source . '"';
+        $dest = '"' . $this->destination . '"';
 
         if ($this->srcDestOrder === 'STANDARD'){
             $srcDestOptions = [
